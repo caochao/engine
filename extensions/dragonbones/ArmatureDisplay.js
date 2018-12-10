@@ -483,6 +483,21 @@ let ArmatureDisplay = cc.Class({
         return null;
     },
 
+    stopAnimation (animName) {
+        if(!this._armature) {
+            return;
+        }
+        this.animationName = '';
+        this._armature.animation.stop(animName);
+    },
+
+    resetAnimation () {
+        if(!this._armature) {
+            return;
+        }
+        this._armature.animation.reset();
+    },
+
     /**
      * !#en
      * Get the all armature names in the DragonBones Data.

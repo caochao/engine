@@ -11375,6 +11375,55 @@ Camera.prototype.worldToScreen = function worldToScreen (out, worldPos, width, h
   return out;
 };
 
+var _temp_v4 = vec4.create();
+Camera.prototype.worldToScreen2 = function worldToScreen2 (out, worldPos, width, height) {
+  var aspect = width / height;
+  var cx = this._rect.x * width;
+  var cy = this._rect.y * height;
+  var cw = this._rect.w * width;
+  var ch = this._rect.h * height;
+
+  // view matrix
+  this._node.getWorldRT(_matView);
+  mat4.invert(_matView, _matView);
+
+  // projection matrix
+  if (this._projection === enums.PROJ_PERSPECTIVE) {
+    mat4.perspective(_matProj,
+      this._fov,
+      aspect,
+      this._near,
+      this._far
+    );
+  } else {
+    var x = this._orthoHeight * aspect;
+    var y = this._orthoHeight;
+    mat4.ortho(_matProj,
+      -x, x, -y, y, this._near, this._far
+    );
+  }
+
+  // view-projection
+  mat4.mul(_matViewProj, _matProj, _matView);
+
+  // calculate w
+  // var w =
+  //   worldPos.x * _matViewProj.m03 +
+  //   worldPos.y * _matViewProj.m07 +
+  //   worldPos.z * _matViewProj.m11 +
+  //   _matViewProj.m15;
+  // vec3.transformMat4(out, worldPos, _matViewProj);
+
+  vec4.set(_temp_v4, worldPos.x, worldPos.y, worldPos.z, 1);
+  vec4.transformMat4(out, _temp_v4, _matViewProj);
+  var w = out.w;
+
+  out.x = cx + (out.x / w + 1) * 0.5 * cw;
+  out.y = cy + (out.y / w + 1) * 0.5 * ch;
+
+  return out;
+};
+
 Object.defineProperties( Camera.prototype, prototypeAccessors$5 );
 
 // Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd. 

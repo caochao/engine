@@ -478,6 +478,27 @@ var BaseNode = cc.Class({
         return null;
     },
 
+    getChildByPath (childPath) {
+        if(!childPath) {
+            cc.log("Invalid childPath");
+            return null;
+        }
+        const names = childPath.split(".");
+        if(!names.length) {
+            cc.log("Invalid childPath format, should be a.b.c");
+            return null;
+        }
+        let node = this;
+        for(let i = 0, len = names.length; i < len; i++) {
+            node = node.getChildByName(names[i]);
+            if(!node) {
+                cc.log(`Invalid childPath:${names[i]}`);
+                return null;
+            }
+        }
+        return node;
+    },
+
     // composition: ADD
 
     addChild (child) {
